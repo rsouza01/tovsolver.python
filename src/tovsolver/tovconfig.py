@@ -19,7 +19,8 @@
 
 import sys
 import getopt
-import configparser as cp
+#import configparser as cp
+import ConfigParser as cp
 from collections import namedtuple
 
 

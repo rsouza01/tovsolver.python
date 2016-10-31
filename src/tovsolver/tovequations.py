@@ -24,8 +24,7 @@ class TOVException(Exception):
 class TOVEquations:
     """ TOV equations. """
 
-    __INDEX_MASS = 0
-    __INDEX_PRESSURE = 1
+    (__INDEX_MASS, __INDEX_PRESSURE) = (0, 1)
 
     def __init__(self, eos):
 
@@ -33,27 +32,38 @@ class TOVEquations:
 
     def vector_field(self, w, t, p):
 
-        return [self.delta_M_delta_eta(t, w),
-                self.delta_P_delta_eta(t, w)]
+        return [self.delta_m_delta_eta(t, w),
+                self.delta_p_delta_eta(t, w)]
 
-    def delta_M_delta_eta(self, eta, y):
+    def delta_m_delta_eta(self, eta, y):
         mass, pressure = y[0], y[1]
 
         # print("delta_M_delta_r(eta, mass, pressure) = (%f, %e, %e)" % (eta, mass, pressure))
 
-        energy_density = self.__eos.energy_from_pressure(pressure)
+        energy_density = 0.
+
+        try:
+            energy_density = self.__eos.energy_from_pressure(pressure)
+        except ValueError:
+            energy_density = 0.
 
         # print("delta_M_delta_r(eta, mass, pressure, energy) = (%f, %f, %f, %f)" % (eta, mass, pressure, energy_density))
 
         return energy_density * eta ** 2.
 
-    def delta_P_delta_eta(self, eta, y):
+    def delta_p_delta_eta(self, eta, y):
 
         mass, pressure = y[0], y[1]
 
         # print("delta_P_delta_r(eta, mass, pressure) = (%f, %e, %e)" % (eta, mass, pressure))
 
-        energy_density = self.__eos.energy_from_pressure(pressure)
+        energy_density = 0.
+
+        try:
+            energy_density = self.__eos.energy_from_pressure(pressure)
+        except ValueError:
+            energy_density = 0.
+
 
         # print("delta_M_delta_r(eta, mass, pressure, energy) = (%f, %f, %f, %f)" % (eta, mass, pressure, energy_density))
 

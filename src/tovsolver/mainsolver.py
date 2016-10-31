@@ -15,7 +15,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
-
+import sys
+import traceback
 
 from eos import EoS
 from tovequations import TOVEquations
@@ -42,7 +43,6 @@ class TOVSolverConfig:
                  inferior_lim=1e-15,
                  superior_lim=1000,
                  ode_steps=1000000):
-
         # EoS parameters
         self.__central_mass_density = central_mass_density
         self.__cutoff_density = cutoff_density
@@ -89,7 +89,6 @@ class TOVSolverConfig:
 
     def getEoSFileName(self):
         return self.__eos_file_name
-
 
 class TOVSolver:
     """ TOV equation solver. """
@@ -146,7 +145,7 @@ class TOVSolver:
             first_element=self.__config.rk_inferior_lim,
             last_element=self.__config.rk_superior_lim,
             rk_steps=self.__config.rk_ode_steps,
-            derivatives=[tov_equations.delta_M_delta_eta, tov_equations.delta_P_delta_eta],
+            derivatives=[tov_equations.delta_m_delta_eta, tov_equations.delta_p_delta_eta],
             initial_conditions=[mass_0, pressure_0],
             verbose=False)
 
@@ -155,14 +154,17 @@ class TOVSolver:
 
         rk4 = TOVRungeKutta(rk_parameters=rk_parameters,
                             central_energy=self.__config.getCentralEnergy(),
-                            cutoff_density=self.__config.getCutoffDensity() * const.LIGHT_SPEED ** 2.,
+                            cutoff_density=self.__config.getCutoffDensity() * const.LIGHT_SPEED_SQUARED,
                             transition_pressure=self.__config.getTransitionPressure())
 
-        rk4.run()
+        # Debugging purposes
+        # self.solve_via_scipy(rk_parameters, tov_equations)
 
         # TODO: this part can be improved.
 
-        results = rk4.getResult()
+        rk4.run()
+
+        results = rk4.get_result()
 
         star_mass = results.mass * self.__config.getMassScaleFactor() / const.SUN_MASS
 
@@ -170,7 +172,7 @@ class TOVSolver:
         star_radius = results.eta * self.__config.getRadiusScaleFactor() * const.LENGTH_TO_KM
 
         radius_phase_transition_bar = results.radius_phase_transition_bar * \
-                                      self.__config.getRadiusScaleFactor() * const.LENGTH_TO_KM
+            self.__config.getRadiusScaleFactor() * const.LENGTH_TO_KM
 
         quark_core_mass = results.mass_quark_core_bar * self.__config.getMassScaleFactor() / const.SUN_MASS
 
@@ -292,3 +294,24 @@ class TOVSolver:
                                    epsilon / epsilon_0,
                                    pressure,
                                    pressure / epsilon_0))
+
+    def solve_via_scipy(self, rk_parameters, tov_equations):
+
+        eta = np.linspace(rk_parameters.first_element, rk_parameters.last_element, 1000)
+
+        try:
+            parameters = [0,0]
+            solutions = integrate.odeint(tov_equations.vector_field, rk_parameters.initial_conditions, eta, args=(parameters,))
+
+            mass_sol = solutions[:, 0]
+            press_sol = solutions[:, 1]
+        except:
+            traceback.print_exc()
+
+        plt.figure()
+        #plt.plot(eta, mass_sol, label='Massa')
+        plt.plot(eta, press_sol, label='Pressao')
+        plt.xlabel('eta')
+        #plt.ylabel('Massa')
+        plt.ylabel('Pressao')
+        plt.legend(loc=0)

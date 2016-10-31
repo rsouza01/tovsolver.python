@@ -19,6 +19,8 @@
 from numerical import RungeKutta
 from collections import namedtuple
 
+from tovequations import TOVEquations
+
 
 class TOVRK4Result(namedtuple('TOVRK4Result', 'mass pressure eta radius_phase_transition_bar mass_quark_core_bar')):
     """
@@ -29,8 +31,8 @@ class TOVRK4Result(namedtuple('TOVRK4Result', 'mass pressure eta radius_phase_tr
 
 class TOVRungeKutta(RungeKutta):
     """ TOV Runge Kutta implementation. """
-    __MASS_INDEX = 0
-    __PRESSURE_INDEX = 1
+
+    (__INDEX_MASS, __INDEX_PRESSURE) = (0, 1)
 
     def __init__(self, rk_parameters, central_energy=0.0, cutoff_density=0.0, transition_pressure=0.0):
 
@@ -40,6 +42,7 @@ class TOVRungeKutta(RungeKutta):
         self.__star_mass = 0.
         self.__star_pressure = 0.
         self.__transition_radius = 0
+
         self.__central_energy = central_energy
 
         # Dimensionless attributes
@@ -51,7 +54,7 @@ class TOVRungeKutta(RungeKutta):
 
     def must_stop(self, eta, ws):
 
-        if ws[self.__MASS_INDEX] <= self.__cutoff_density_bar or ws[self.__PRESSURE_INDEX] <= 0:
+        if ws[self.__INDEX_MASS] <= self.__cutoff_density_bar or ws[self.__INDEX_PRESSURE] <= 0:
             return True
         else:
             return False
@@ -76,7 +79,7 @@ class TOVRungeKutta(RungeKutta):
                 self.__radius_phase_transition_bar = eta
                 self.__mass_quark_core_bar = self.__star_mass
 
-    def getResult(self):
+    def get_result(self):
 
         return TOVRK4Result(mass=self.__star_mass,
                             pressure=self.__star_pressure,
