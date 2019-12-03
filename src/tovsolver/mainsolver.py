@@ -43,6 +43,8 @@ class TOVSolverConfig:
                  inferior_lim=1e-15,
                  superior_lim=1000,
                  ode_steps=1000000):
+
+
         # EoS parameters
         self.__central_mass_density = central_mass_density
         self.__cutoff_density = cutoff_density
@@ -61,11 +63,12 @@ class TOVSolverConfig:
         self.__central_energy = central_mass_density * const.LIGHT_SPEED_SQUARED
 
         self.__a = (const.LIGHT_SPEED_SQUARED /
-                    (4. * math.pi * const.GRAVITATIONAL_CONSTANT * self.__central_mass_density)) ** .5
+                    (4. * math.pi * const.GRAVITATIONAL_CONSTANT * central_mass_density)) ** .5
 
-        self.__m_star = 4. * math.pi * self.__central_mass_density * self.__a ** 3.
+        self.__m_star = 4. * math.pi * central_mass_density * self.__a ** 3.
 
         # print("__cutoff_density = {}".format(self.__cutoff_density))
+        # print("rho_0 = {}".format(self.__central_mass_density))
         # print("a = {}".format(self.__a))
         # print("M* = {}".format(self.__m_star))
 
@@ -253,9 +256,9 @@ class TOVSolver:
              "#--------------------------------------------------------------------------------------------#\n")
 
         print(summary_format.format(star_radius,
-                                    radius_phase_transition,
+                                    radius_phase_transition if radius_phase_transition > 0 else 0,
                                     star_mass,
-                                    quark_core_mass,
+                                    quark_core_mass if quark_core_mass > 0 else 0,
                                     baryon_number,
                                     info_entropy,
                                     diseq,

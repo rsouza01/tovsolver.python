@@ -16,7 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-LENGTH_TO_KM            = 1e-5
+LENGTH_TO_KM            = 1.e-5
 
 LIGHT_SPEED 			= 2.998e10     # cm s
 LIGHT_SPEED_SQUARED     = 8.988004e26  # cm2 s2

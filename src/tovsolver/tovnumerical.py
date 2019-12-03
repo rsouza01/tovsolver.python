@@ -54,12 +54,13 @@ class TOVRungeKutta(RungeKutta):
 
     def must_stop(self, eta, ws):
 
-        if ws[self.__INDEX_MASS] <= self.__cutoff_density_bar or ws[self.__INDEX_PRESSURE] <= 0:
+        # if ws[self.__INDEX_MASS] <= self.__cutoff_density_bar or ws[self.__INDEX_PRESSURE] <= 0:
+        if ws[self.__INDEX_PRESSURE] <= 0:
             return True
         else:
             return False
 
-    def perform_calculations(self, eta, ws):
+    def perform_calculationZZxs(self, eta, ws):
         self.__star_eta = eta
         self.__star_mass = ws[0]
         self.__star_pressure = ws[1]
